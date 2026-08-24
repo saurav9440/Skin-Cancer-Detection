@@ -1,412 +1,616 @@
-# Skin Cancer Detection and Classification Using Deep Learning
+🩺 Skin Disease Detection and Classification Using Deep Learning
 
-A hybrid deep learning-based computer-aided diagnostic system for detecting and classifying skin diseases from dermoscopic images.
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-Deep%20Learning-blue?style=for-the-badge&logo=python">
+  <img src="https://img.shields.io/badge/TensorFlow-Keras-orange?style=for-the-badge&logo=tensorflow">
+  <img src="https://img.shields.io/badge/U--Net-Segmentation-green?style=for-the-badge">
+  <img src="https://img.shields.io/badge/Vision%20Transformer-ViT-purple?style=for-the-badge">
+  <img src="https://img.shields.io/badge/Status-Completed-success?style=for-the-badge">
+</p>
 
-The proposed system combines **U-Net lesion segmentation**, **EfficientNetV2-S feature extraction**, and a **Vision Transformer (ViT)** to analyze both local and global characteristics of skin lesions.
+📌 Overview
 
-## Project Overview
+This project presents a deep learning-based skin disease detection and classification system developed as a Final Year Project.
 
-The system follows a two-stage hybrid deep learning pipeline:
+The proposed framework combines lesion segmentation using U-Net with a hybrid classification architecture using EfficientNetV2-S and Vision Transformer (ViT).
 
-1. **Lesion Segmentation** using U-Net
-2. **Feature Extraction and Classification** using EfficientNetV2-S + Vision Transformer (ViT)
+The segmentation stage identifies the lesion region using a mask, allowing the classification model to focus on the affected region rather than irrelevant background information.
 
-A segmentation-guided **4-channel input** is created by combining the normalized RGB image with the lesion mask. The final framework performs **12-class skin disease classification** and reports a **validation accuracy of 89.14%**.
+The classification pipeline uses a 4-channel input consisting of RGB image information and the lesion mask. EfficientNetV2-S is used to learn detailed local visual features, while the Vision Transformer captures global relationships and structural information within the lesion.
 
-## Objectives
+The project also incorporates balanced sampling, data augmentation, focal loss and Test-Time Augmentation (TTA) to improve classification performance and robustness.
 
-- Automate skin disease detection from dermoscopic images.
-- Segment lesions using U-Net.
-- Extract local features using EfficientNetV2-S.
-- Capture global lesion structure using Vision Transformer.
-- Handle class imbalance using balanced sampling.
-- Improve prediction stability using Test-Time Augmentation (TTA).
-- Provide prediction labels, confidence scores, segmentation masks and visualization.
-- Develop a practical computer-aided diagnostic prototype.
+🎯 Objectives
 
-## Proposed Architecture
+Develop an automated skin disease detection and classification system.
 
-```text
-Dermoscopic Image
-       |
-       v
-Image Preprocessing
-       |
-       v
-U-Net Lesion Segmentation
-       |
-       v
-Lesion Mask + Normalized RGB
-       |
-       v
-4-Channel Input
-       |
-       v
+Segment the lesion region using U-Net.
+
+Generate and utilize lesion masks for classification.
+
+Combine RGB information with the lesion mask as a 4-channel input.
+
+Extract detailed visual features using EfficientNetV2-S.
+
+Capture global spatial relationships using Vision Transformer (ViT).
+
+Address class imbalance using balanced sampling.
+
+Improve model robustness using Test-Time Augmentation (TTA).
+
+Evaluate the final classifier using standard classification metrics.
+
+🏗️ System Architecture
+
+                 Dermoscopic Image
+                         │
+                         ▼
+                Image Preprocessing
+                         │
+                         ▼
+                 Lesion Segmentation
+                         │
+                         ▼
+                      U-Net
+                         │
+                         ▼
+                   Lesion Mask
+                         │
+             ┌───────────┴───────────┐
+             │                       │
+             ▼                       ▼
+        RGB Image              Lesion Mask
+             │                       │
+             └───────────┬───────────┘
+                         ▼
+                 4-Channel Input
+                  RGB + Mask
+                         │
+                         ▼
+                 EfficientNetV2-S
+                Local Feature Learning
+                         │
+                         ▼
+                 Vision Transformer
+                Global Feature Learning
+                         │
+                         ▼
+              Pooling + Classification
+                         │
+                         ▼
+                 Disease Prediction
+                         │
+                         ▼
+             Class + Confidence Score
+
+🧠 Methodology
+
+Step 1 — Image Preprocessing
+
+The input dermoscopic images are prepared before being passed to the deep learning models.
+
+The preprocessing pipeline includes:
+
+Image resizing
+
+Pixel normalization
+
+Image format handling
+
+Data augmentation during training
+
+Lesion-region preparation
+
+Step 2 — Lesion Mask Generation
+
+Initial lesion masks are generated using HSV/HSL-based image processing.
+
+These masks provide an approximate representation of the lesion region and are used as the target information for training the segmentation model.
+
+The generated masks help identify the region of interest while reducing irrelevant background information.
+
+Step 3 — U-Net Segmentation
+
+A U-Net architecture is trained using the generated lesion masks.
+
+The U-Net follows an encoder-decoder architecture:
+
+Input Image
+     │
+     ▼
+Encoder
+     │
+     ├── Feature Extraction
+     ├── Downsampling
+     └── Context Learning
+     │
+     ▼
+Bottleneck
+     │
+     ▼
+Decoder
+     │
+     ├── Upsampling
+     ├── Feature Reconstruction
+     └── Skip Connections
+     │
+     ▼
+Predicted Lesion Mask
+
+The trained U-Net can then predict a lesion mask for a new input image.
+
+Step 4 — 4-Channel Input
+
+The predicted lesion mask is combined with the original RGB image.
+
+RGB Image  → 3 channels
+Mask       → 1 channel
+                    │
+                    ▼
+             4-Channel Input
+
+This gives the classification model both the original visual information and explicit lesion-region information.
+
+Step 5 — EfficientNetV2-S
+
+EfficientNetV2-S is used for feature extraction.
+
+It learns detailed local characteristics such as:
+
+Texture
+
+Color patterns
+
+Lesion boundaries
+
+Fine-grained visual patterns
+
+Local structural information
+
+Step 6 — Vision Transformer (ViT)
+
+The extracted feature representation is further processed using a Vision Transformer.
+
+ViT uses self-attention to learn relationships between different regions of the feature representation.
+
+It helps capture:
+
+Global lesion structure
+
+Shape
+
+Symmetry
+
+Spatial relationships
+
+Long-range dependencies
+
+Step 7 — Classification
+
+The learned features are passed to the final classification stage.
+
+The classification pipeline produces:
+
+Predicted disease class
+
+Class probability
+
+Confidence score
+
+Step 8 — Balanced Sampling
+
+The dataset contains class imbalance.
+
+A balanced generator is used during training to sample images from different classes more uniformly.
+
+This helps prevent the model from becoming overly biased toward classes with a larger number of training samples.
+
+Step 9 — Focal Loss
+
+Categorical Focal Crossentropy is used as the classification loss.
+
+Focal loss gives more emphasis to difficult training examples and helps address the effect of class imbalance.
+
+The implementation uses:
+
+Gamma = 2.0
+
+Label smoothing = 0.1
+
+Step 10 — Test-Time Augmentation
+
+Test-Time Augmentation (TTA) is used during final prediction.
+
+Multiple transformed versions of an input image can be evaluated and their predictions combined.
+
+This helps improve prediction stability and robustness.
+
+📊 Dataset
+
+The project uses dermoscopic skin lesion images based on the HAM10000 dataset and the prepared project dataset.
+
+The project dataset contains original images and corresponding lesion masks used for the segmentation and classification pipeline.
+
+The dataset contains multiple skin disease categories and exhibits class imbalance, which is addressed during model training.
+
+The complete image dataset is not included in this GitHub repository because of its large size.
+
+📈 Model Performance
+
+The project reports a validation accuracy of 89.14% for the classification system.
+
+Component
+
+Details
+
+Segmentation
+
+U-Net
+
+Mask Generation
+
+HSV/HSL-based preprocessing
+
+Classification Backbone
+
 EfficientNetV2-S
-(Local Features)
-       |
-       v
-Vision Transformer
-(Global Features)
-       |
-       v
-Pooling + Dropout
-       |
-       v
-Softmax Classifier
-       |
-       v
-12-Class Disease Prediction
-```
 
-## Methodology
+Global Feature Learning
 
-### Image Preprocessing
+Vision Transformer (ViT)
 
-- Image resizing
-- RGB conversion
-- Normalization
-- Noise reduction
-- Hair and artifact removal
-- Data augmentation
+Input
 
-### Lesion Segmentation
+RGB + Lesion Mask
 
-U-Net identifies the lesion region and produces a binary lesion mask. This helps reduce irrelevant background information such as healthy skin, hair, shadows and other artifacts.
+Input Channels
 
-### Segmentation-Guided 4-Channel Input
+4
 
-```text
-RGB Image   -> 3 Channels
-Lesion Mask -> 1 Channel
-                    |
-                    v
-             4-Channel Tensor
-```
-
-### EfficientNetV2-S
-
-EfficientNetV2-S extracts detailed local features such as texture, color variation, lesion boundaries and fine-grained skin patterns.
-
-### Vision Transformer
-
-ViT captures global information including lesion structure, shape, symmetry, spatial relationships and long-range dependencies.
-
-### Classification
-
-The final representation is processed through global average pooling, dropout and a fully connected softmax classification layer to predict one of 12 disease categories.
-
-### Balanced Sampling
-
-Balanced sampling is used to reduce bias caused by class imbalance and improve minority-class learning.
-
-### Test-Time Augmentation
-
-Multiple transformed versions of an input image are evaluated and their predictions are combined to obtain a more stable final prediction.
-
-## Dataset
-
-The project uses the **HAM10000 (Human Against the Machine with 10000 training images)** dermoscopic image dataset.
-
-The dataset contains dermoscopic images, disease metadata and multiple skin disease categories with class imbalance.
-
-> The complete dataset is not included in this repository.
-
-## Results
-
-| Metric | Result |
-|---|---|
-| Classification Type | Multi-Class |
-| Number of Classes | 12 |
-| Validation Accuracy | **89.14%** |
-| Segmentation Model | U-Net |
-| Feature Extractor | EfficientNetV2-S |
-| Global Feature Model | Vision Transformer |
-| Input | 4-Channel RGB + Mask |
-| Class Balancing | Balanced Sampling |
-| Prediction Enhancement | TTA |
-
-## Web Application
-
-The project includes a web-based interface.
-
-### Frontend
-- EJS
-- HTML5
-- CSS3
-- JavaScript
-- jsPDF
-
-### Backend
-- Node.js
-- Express.js
-
-### Database
-- MongoDB
-- Mongoose
-
-### Features
-- User authentication
-- Image upload
-- Prediction visualization
-- Scan history
-- Dashboard
-- Diagnostic report generation
-
-## Project Structure
-
-```text
-Skin-Cancer-Detection/
-|
-├── frontend/
-│   ├── views/
-│   ├── public/
-│   └── routes/
-|
-├── backend/
-│   ├── controllers/
-│   ├── models/
-│   ├── routes/
-│   └── server.js
-|
-├── ml/
-│   ├── preprocessing/
-│   ├── segmentation/
-│   ├── classification/
-│   ├── evaluation/
-│   └── inference/
-|
-├── models/
-│   ├── unet_model.keras
-│   └── classifier_model.keras
-|
-├── screenshots/
-├── requirements.txt
-├── package.json
-└── README.md
-```
-
-> Adjust the structure above to match the actual repository structure.
-
-## Technologies Used
-
-- Python
-- TensorFlow
-- Keras
-- OpenCV
-- NumPy
-- Pandas
-- Scikit-learn
-- Matplotlib
-- U-Net
-- EfficientNetV2-S
-- Vision Transformer
-- Node.js
-- Express.js
-- EJS
-- MongoDB
-- Mongoose
-- JavaScript
-- HTML5
-- CSS3
-
-## Installation
-
-### Clone Repository
-
-```bash
-git clone https://github.com/YOUR-USERNAME/Skin-Cancer-Detection.git
-cd Skin-Cancer-Detection
-```
-
-### Python Environment
-
-```bash
-python -m venv venv
-```
-
-Windows:
-
-```bash
-venv\\Scripts\\activate
-```
-
-Linux/macOS:
-
-```bash
-source venv/bin/activate
-```
-
-### Install Python Dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-### Install Node Dependencies
-
-```bash
-npm install
-```
-
-## Environment Variables
-
-Create a `.env` file:
-
-```env
-MONGO_URI=your_mongodb_connection_string
-PORT=5000
-```
-
-Do not upload `.env` to GitHub.
-
-Recommended `.gitignore` entries:
-
-```text
-.env
-venv/
-__pycache__/
-node_modules/
-*.h5
-*.keras
-```
-
-## Running the Application
-
-Start the Node.js backend:
-
-```bash
-node server.js
-```
-
-If the ML component has a Python entry point:
-
-```bash
-python app.py
-```
-
-## Evaluation
-
-The classification system uses:
-
-- Accuracy
-- Precision
-- Recall
-- F1-score
-- Confusion Matrix
-
-Segmentation can be evaluated using IoU/Dice coefficient where applicable.
-
-## System Workflow
-
-```text
-User
- |
- v
-Upload Dermoscopic Image
- |
- v
-Preprocessing
- |
- v
-U-Net Segmentation
- |
- v
-Lesion Mask
- |
- v
-RGB + Mask
- |
- v
-4-Channel Input
- |
- v
-EfficientNetV2-S
- |
- v
-Local Features
- |
- v
-Vision Transformer
- |
- v
-Global Features
- |
- v
 Classification
- |
- v
-Disease + Confidence
- |
- +--> Segmentation Visualization
- +--> Prediction Result
- +--> Scan History
- +--> Diagnostic Report
-```
 
-## Team
+Multi-Class
 
-| Name | Role |
-|---|---|
-| **Revan Kale** | Research, Dataset Analysis & Documentation |
-| **Saurav Mane** | U-Net Segmentation |
-| **Omkar Padule** | EfficientNetV2-S & Vision Transformer |
-| **Onkar Pandhare** | Testing, Evaluation & System Integration |
+Validation Accuracy
 
-### Project Guide
+89.14%
 
-**Mrs. Y. N. Sakhare**
+Class Balancing
 
-Department of Information Technology  
+Balanced Sampling
+
+Loss Function
+
+Categorical Focal Crossentropy
+
+Prediction Enhancement
+
+Test-Time Augmentation
+
+The 89.14% value is reported as validation accuracy. Test accuracy should be reported separately if obtained from the final held-out test evaluation.
+
+💻 Technologies Used
+
+Programming
+
+Python
+
+Jupyter Notebook
+
+Deep Learning
+
+TensorFlow
+
+Keras
+
+U-Net
+
+EfficientNetV2-S
+
+Vision Transformer (ViT)
+
+Computer Vision
+
+OpenCV
+
+HSV/HSL image processing
+
+Image preprocessing
+
+Image augmentation
+
+Lesion segmentation
+
+Machine Learning
+
+Scikit-learn
+
+Classification Report
+
+Confusion Matrix
+
+Accuracy
+
+Precision
+
+Recall
+
+F1-score
+
+Data Processing
+
+NumPy
+
+Pandas
+
+📂 Repository Structure
+
+DermaScan/
+│
+├── screenshots/
+│
+├── U-Net.ipynb
+│
+├── Main_Model.ipynb
+│
+└── README.md
+
+U-Net Notebook
+
+The U-Net notebook contains the lesion segmentation workflow, including:
+
+Dataset preparation
+
+Mask loading
+
+Image preprocessing
+
+U-Net architecture
+
+Model training
+
+Segmentation evaluation
+
+Predicted mask generation
+
+Main Model Notebook
+
+The main notebook contains the classification workflow, including:
+
+Dataset preparation
+
+Balanced data generation
+
+4-channel image + mask preparation
+
+EfficientNetV2-S feature extraction
+
+Vision Transformer integration
+
+Model training
+
+Validation
+
+Test evaluation
+
+TTA-based prediction
+
+Classification metrics
+
+🔄 Complete Workflow
+
+Dataset
+   │
+   ▼
+Original Dermoscopic Images
+   │
+   ▼
+HSV/HSL-Based Mask Generation
+   │
+   ▼
+Training Masks
+   │
+   ▼
+U-Net Training
+   │
+   ▼
+Predicted Lesion Masks
+   │
+   ▼
+RGB Image + Predicted Mask
+   │
+   ▼
+4-Channel Input
+   │
+   ▼
+EfficientNetV2-S
+   │
+   ▼
+Local Features
+   │
+   ▼
+Vision Transformer
+   │
+   ▼
+Global Features
+   │
+   ▼
+Classification Layer
+   │
+   ▼
+Skin Disease Prediction
+   │
+   ▼
+Confidence + Evaluation Metrics
+
+📸 Screenshots
+
+Project screenshots are included in the screenshots/ directory.
+
+Add your screenshots to the folder and update the filenames below to match the actual files in your repository.
+
+screenshots/
+├── login.png
+├── dashboard.png
+├── upload.png
+├── segmentation.png
+├── prediction.png
+└── report.png
+
+Example:
+
+![Prediction Result](screenshots/prediction.png)
+
+🧪 Evaluation
+
+The classification model can be evaluated using:
+
+Accuracy
+
+Precision
+
+Recall
+
+F1-score
+
+Confusion Matrix
+
+Classification Report
+
+The segmentation model can be evaluated using appropriate segmentation metrics such as:
+
+IoU
+
+Dice Coefficient
+
+🚀 How to Use the Notebooks
+
+1. U-Net Segmentation
+
+Open:
+
+U-Net.ipynb
+
+Set the dataset paths according to your environment and execute the cells in sequence.
+
+The notebook trains the U-Net model and generates predicted lesion masks.
+
+2. Main Classification Model
+
+Open:
+
+Main_Model.ipynb
+
+Set the image and mask paths and execute the cells in sequence.
+
+The notebook performs classification using the segmentation-guided hybrid deep learning architecture.
+
+Dataset paths may need to be changed depending on whether the notebooks are executed on Kaggle, Google Colab, or a local machine.
+
+🎓 Academic Project
+
+Final Year Project — Skin Disease Detection and Classification Using Deep Learning
+
+Department of Information Technology
+
 Vidya Pratishthan's Kamalnayan Bajaj Institute of Engineering and Technology, Baramati
 
-## Academic Project
+Savitribai Phule Pune University, Pune
 
-**Project Stage-II — 2025–2026**
+👥 Project Team
 
-Department of Information Technology  
-Vidya Pratishthan's Kamalnayan Bajaj Institute of Engineering and Technology, Baramati, Maharashtra, India
+This project was developed as a group Final Year Project.
 
-Submitted under **Savitribai Phule Pune University, Pune**.
+Add the final team-member names and individual contributions exactly as listed in your final project report.
 
-## Disclaimer
+Team Member
 
-This project is developed for **academic and research purposes**.
+Contribution
 
-The system is intended as a computer-aided diagnostic support tool and should not be considered a replacement for professional medical diagnosis. Final diagnosis and treatment decisions must be made by qualified healthcare professionals.
+Team Member 1
 
-## Future Scope
+Project / Research
 
-- Clinical validation using real-world clinical datasets
-- Larger and more diverse datasets
-- Improved segmentation accuracy
-- Additional disease categories
-- Improved model explainability
-- Integration of clinical metadata
-- Mobile application deployment
-- Real-time healthcare system integration
-- Improved computational efficiency
-- Continuous model optimization
+Team Member 2
 
-## References
+U-Net Segmentation
 
-1. L. Riaz et al., **"A Comprehensive Joint Learning System to Detect Skin Cancer,"** IEEE Access, 2023.
-2. R. Raja Sekar et al., **"Skin Cancer Prediction Using Deep Learning Techniques,"** ICSPC, 2023.
-3. J. R. Hagerty et al., **"Deep Learning and Handcrafted Method Fusion: Higher Diagnostic Accuracy for Melanoma Dermoscopy Images,"** IEEE Journal of Biomedical and Health Informatics, 2019.
-4. S. Archana and N. Shyamsundar, **"Computational Intelligence for Detection of Skin Cancer Using Deep Learning Classifiers,"** 2021.
-5. P. Thapar et al., **"A Novel Hybrid Deep Learning Approach for Skin Lesion Segmentation and Classification,"** Journal of Healthcare Engineering, 2022.
+Team Member 3
 
-## Key Highlights
+EfficientNetV2-S & ViT
 
-- Hybrid Deep Learning Architecture
-- U-Net Lesion Segmentation
-- EfficientNetV2-S Feature Extraction
-- Vision Transformer for Global Feature Learning
-- Segmentation-Guided 4-Channel Input
-- Balanced Class Sampling
-- Test-Time Augmentation
-- 12-Class Skin Disease Classification
-- 89.14% Reported Validation Accuracy
-- Full-Stack Web Interface
-- MongoDB-Based Scan History
-- Diagnostic Report Generation
+Team Member 4
+
+Testing & Integration
+
+Replace the placeholders above with the exact names and contributions from your final report.
+
+⚠️ Disclaimer
+
+This project is developed for academic and research purposes.
+
+The system is intended as a computer-aided diagnostic support system and should not be considered a replacement for professional medical diagnosis.
+
+Final diagnosis and treatment decisions must be made by qualified healthcare professionals.
+
+🔮 Future Scope
+
+Improve lesion segmentation accuracy.
+
+Train using larger and more diverse datasets.
+
+Perform clinical validation using real-world clinical data.
+
+Improve model explainability.
+
+Integrate additional clinical metadata.
+
+Support additional skin disease categories.
+
+Optimize the model for mobile and edge-device deployment.
+
+Develop a complete clinical decision-support application.
+
+Improve inference speed and computational efficiency.
+
+📚 References
+
+L. Riaz et al., "A Comprehensive Joint Learning System to Detect Skin Cancer," IEEE Access, 2023.
+
+R. Raja Sekar et al., "Skin Cancer Prediction Using Deep Learning Techniques," ICSPC, 2023.
+
+J. R. Hagerty et al., "Deep Learning and Handcrafted Method Fusion: Higher Diagnostic Accuracy for Melanoma Dermoscopy Images," IEEE Journal of Biomedical and Health Informatics, 2019.
+
+S. Archana and N. Shyamsundar, "Computational Intelligence for Detection of Skin Cancer Using Deep Learning Classifiers," 2021.
+
+P. Thapar et al., "A Novel Hybrid Deep Learning Approach for Skin Lesion Segmentation and Classification," Journal of Healthcare Engineering, 2022.
+
+⭐ Key Highlights
+
+🧠 Hybrid Deep Learning Framework
+
+🔬 U-Net Lesion Segmentation
+
+🎨 HSV/HSL-Based Mask Generation
+
+⚡ EfficientNetV2-S Feature Extraction
+
+🤖 Vision Transformer Global Feature Learning
+
+🖼️ Segmentation-Guided 4-Channel Input
+
+⚖️ Balanced Class Sampling
+
+🎯 Categorical Focal Crossentropy
+
+🔄 Test-Time Augmentation
+
+📊 Multi-Class Skin Disease Classification
+
+📈 89.14% Reported Validation Accuracy
+
+💻 Jupyter Notebook-Based Implementation
+
+📜 License
+
+This project is developed for educational and research purposes.
